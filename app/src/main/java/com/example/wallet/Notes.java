@@ -1,5 +1,6 @@
 package com.example.wallet;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wallet.Model.DatabaseHelper;
 import com.example.wallet.Model.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 
@@ -21,7 +23,8 @@ public class Notes extends AppCompatActivity {
     private RecyclerView recyclerViewTasks;
     private TaskAdapter taskAdapter;
     private List<Task> taskList;
-    private DatabaseHelper dbHelper; // Database helper
+    private DatabaseHelper dbHelper;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,21 @@ public class Notes extends AppCompatActivity {
                     editTextTask.setText("");
                 }
             }
+        });
+
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_note) {
+                return true;
+            } else if (id == R.id.nav_home) {
+                startActivity(new Intent(Notes.this, MainActivity.class));
+                return true;
+            } else if (id == R.id.nav_history) {
+                startActivity(new Intent(Notes.this, History.class));
+                return true;
+            }
+            return false;
         });
     }
 }
