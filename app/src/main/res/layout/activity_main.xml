@@ -32,6 +32,18 @@
             android:layout_marginBottom="16dp"
             android:gravity="center_vertical">
 
+            <TextView
+                android:id="@+id/tvMonthPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Month"
+                android:textSize="18sp"
+                android:padding="12dp"
+                android:textColor="@android:color/black"
+                />
+
+
+
             <!-- Total Spent Text -->
             <TextView
                 android:id="@+id/tvTotalSpent"

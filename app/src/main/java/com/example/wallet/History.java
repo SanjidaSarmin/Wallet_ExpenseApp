@@ -3,17 +3,14 @@ package com.example.wallet;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.wallet.Model.DatabaseHelper;
+import com.example.wallet.Model.Expense;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class History extends AppCompatActivity {
@@ -48,7 +45,7 @@ public class History extends AppCompatActivity {
                 startActivity(new Intent(History.this, MainActivity.class));
                 return true;
             } else if (id == R.id.nav_note) {
-                startActivity(new Intent(History.this, Note.class));
+                startActivity(new Intent(History.this, Notes.class));
                 return true;
             }
             return false;

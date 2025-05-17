@@ -1,4 +1,4 @@
-package com.example.wallet;
+package com.example.wallet.Model;
 
 
 import android.annotation.SuppressLint;
@@ -16,7 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Database name and version
     private static final String DATABASE_NAME = "wallet_db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Expense table details
     private static final String TABLE_EXPENSES = "expenses";
@@ -29,25 +29,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+
     // Create the database table when the app is first run
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_TABLE = "CREATE TABLE " + TABLE_EXPENSES + "("
+        String CREATE_EXPENSE_TABLE = "CREATE TABLE " + TABLE_EXPENSES + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_NAME + " TEXT,"
                 + COLUMN_AMOUNT + " REAL,"
                 + COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP" + ")";
-        db.execSQL(CREATE_TABLE);
+        db.execSQL(CREATE_EXPENSE_TABLE);
+
+        // New tasks table
+        String CREATE_TASK_TABLE = "CREATE TABLE IF NOT EXISTS notes ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "taskText TEXT, "
+                + "done INTEGER DEFAULT 0)";
+        db.execSQL(CREATE_TASK_TABLE);
+
     }
+
+
 
     // Upgrade the database if needed (e.g., if a new version is released)
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS notes");
+
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXPENSES);
+
         onCreate(db);
     }
 
-    // Insert a new expense into the database
+
     public void addExpense(Expense expense) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -58,7 +72,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close(); // Close the database connection
     }
 
-    // Get all expenses from the database
+
     public List<Expense> getAllExpenses() {
         List<Expense> expenseList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -86,7 +100,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return expenseList;
     }
 
-    // Get the total amount spent from all expenses
+
     public double getTotalSpent() {
         SQLiteDatabase db = this.getReadableDatabase();
         String SELECT_TOTAL_SPENT = "SELECT SUM(" + COLUMN_AMOUNT + ") FROM " + TABLE_EXPENSES;
@@ -170,6 +184,75 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         db.close();
         return expenseList;
+    }
+
+    public List<Expense> getExpensesByMonth(String yearMonth) {
+        List<Expense> expenseList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM expenses WHERE strftime('%Y-%m', timestamp) = ? ORDER BY timestamp DESC";
+        Cursor cursor = db.rawQuery(query, new String[]{yearMonth});
+
+        if (cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") int id = cursor.getInt(cursor.getColumnIndex("id"));
+                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex("name"));
+                @SuppressLint("Range") double amount = cursor.getDouble(cursor.getColumnIndex("amount"));
+                @SuppressLint("Range") String timestamp = cursor.getString(cursor.getColumnIndex("timestamp"));
+
+                Expense expense = new Expense(id, name, amount, timestamp);
+                expenseList.add(expense);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return expenseList;
+    }
+
+
+    public void addTask(Task task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("taskText", task.getTaskText());
+        values.put("done", task.isDone() ? 1 : 0);
+        db.insert("notes", null, values);
+        db.close();
+    }
+
+
+    public List<Task> getAllTasks() {
+        List<Task> tasks = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM notes", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                String task = cursor.getString(cursor.getColumnIndexOrThrow("taskText"));
+                int isDone = cursor.getInt(cursor.getColumnIndexOrThrow("done"));
+                tasks.add(new Task(id, task, isDone == 1));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return tasks;
+    }
+
+    public void updateTask(Task task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("taskText", task.getTaskText());
+        values.put("done", task.isDone() ? 1 : 0);
+        db.update("notes", values, "id = ?", new String[]{String.valueOf(task.getId())});
+        db.close();
+    }
+
+    public void deleteTask(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("notes", "id = ?", new String[]{String.valueOf(id)});
+        db.close();
     }
 
 

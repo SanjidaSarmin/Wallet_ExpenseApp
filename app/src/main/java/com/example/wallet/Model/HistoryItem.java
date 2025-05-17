@@ -1,4 +1,4 @@
-package com.example.wallet;
+package com.example.wallet.Model;
 
 public class HistoryItem {
     private String title;

@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.wallet.Model.Expense;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -1,9 +1,4 @@
-package com.example.wallet;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+package com.example.wallet.Model;
 
 public class Expense {
 
